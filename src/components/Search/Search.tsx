@@ -88,7 +88,7 @@ export default function Search() {
 
 const styles = StyleSheet.create({
   searchContainer: {
-    height: 330,
+    height: 300,
     backgroundColor: "white",
     borderRadius: 15,
     marginHorizontal: 15,
@@ -98,13 +98,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
+    padding:5,
   },
   label: {
     fontSize: 15,
     fontWeight: "500",
     marginBottom: 10,
     marginLeft: 15,
-    marginTop: 10,
+    marginTop: 5,
   },
   searchInput: {
     flexDirection: "row",

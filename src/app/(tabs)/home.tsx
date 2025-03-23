@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +19,7 @@ import Search from "@/src/components/Search/Search";
 import Location_modal from "@/src/modals/Location_modal";
 import HotelCard from "@/src/components/Card/HotelCard";
 import { MotiScrollView, ScrollView } from "moti";
+import { router } from "expo-router";
 
 export default function Home() {
   const recentlyViewed: {
@@ -73,7 +75,12 @@ export default function Home() {
             <Text style={styles.locationText}>Jakarta, Indonesia</Text>
           </View>
 
+          <TouchableOpacity onPress={()=>{
+            router.push("/Notification")
+          }}>
+
           <Ionicons name="notifications" size={19} color="white" />
+          </TouchableOpacity>
         </View>
 
         {/* Title Section */}
@@ -125,7 +132,7 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
+    flex: 1
   },
   linearGradient: {
     // borderBottomRightRadius: 50,
@@ -135,6 +142,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 6,
     height: 530,
+    paddingTop: StatusBar.currentHeight,
   },
   header: {
     flexDirection: "row",

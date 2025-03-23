@@ -12,12 +12,13 @@ import { Colors } from "@/contants/Colors";
 import { MotiView, MotiText } from "moti";
 import { router } from "expo-router";
 import Location_modal from "@/src/modals/Location_modal";
+import SlidableButton from "../components/Button/SlideButton";
+import SlideToStart from "../components/Button/SlideButton";
 
 export default function Onboarding() {
   return (
     <View style={styles.container}>
-      
-{/* <Location_modal/> */}
+      {/* <Location_modal/> */}
       <ImageBackground
         source={require("../../assets/images/main/home.png")}
         style={styles.backgroundImage}
@@ -49,18 +50,23 @@ export default function Onboarding() {
           </View>
 
           {/* Floating Image */}
-          <TouchableOpacity onPressIn={()=>{
-            router.push("/(tabs)/home")
-          }} activeOpacity={0.8}  style={{ position: 'relative', zIndex: 10 }}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={{
+              position: "relative",
+              zIndex: 10,
+              height: "100%",
+              justifyContent: "center",
+            }}
+          >
             <MotiView
               from={{ opacity: 0, translateY: 50 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ delay: 700, duration: 1200 }}
             >
-              <Image
-                style={styles.image}
-                source={require("../../assets/images/main/start.png")}
-              />
+              <SlideToStart onSlideComplete={() => {
+                router.push("/home")
+              }} />
             </MotiView>
           </TouchableOpacity>
         </MotiView>
@@ -87,7 +93,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: "space-between",
+
+    // justifyContent: "space-between",
 
     alignItems: "center",
   },
@@ -108,16 +115,15 @@ const styles = StyleSheet.create({
   image: {
     width: 280,
     height: 200,
-    opacity:0.9,
+    opacity: 0.9,
     resizeMode: "contain",
-    marginBottom:100 ,
-
+    marginBottom: 100,
   },
   gradient: {
     position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
-    height: 200,
+    height: 230,
   },
 });
