@@ -20,6 +20,8 @@ import Location_modal from "@/src/modals/Location_modal";
 import HotelCard from "@/src/components/Card/HotelCard";
 import { MotiScrollView, ScrollView } from "moti";
 import { router } from "expo-router";
+import { logOut } from "@/src/api/auth";
+import { useDispatch } from "react-redux";
 
 export default function Home() {
   const recentlyViewed: {
@@ -48,6 +50,13 @@ export default function Home() {
     },
   ];
 
+  const dispatch= useDispatch();
+
+  async function onLogout(){
+    await logOut(dispatch);
+    router.replace("/(tabs)/home")
+  }
+
   return (
     <MotiScrollView>
       
@@ -65,10 +74,13 @@ export default function Home() {
       >
         {/* Header Section */}
         <View style={styles.header}>
+          <TouchableOpacity onPress={onLogout}>
+
           <Image
             style={styles.profileImage}
             source={require("../../../assets/images/main/profile.png")}
-          />
+            />
+            </TouchableOpacity>
 
           <View style={styles.locationContainer}>
             <Entypo name="location-pin" size={17} color="white" />

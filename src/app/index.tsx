@@ -6,7 +6,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "@/contants/Colors";
 import { MotiView, MotiText } from "moti";
@@ -14,8 +14,42 @@ import { router } from "expo-router";
 import Location_modal from "@/src/modals/Location_modal";
 import SlidableButton from "../components/Button/SlideButton";
 import SlideToStart from "../components/Button/SlideButton";
+import { authUser } from "../api/auth";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Onboarding() {
+  const [isReady, setIsReady] = useState(false);
+  const dispatch = useDispatch();
+  const {isAuthenticated, user, token} = useSelector((state: any) => state.auth);
+  
+  const checkAuth = async () => {
+    await authUser(dispatch);
+  }
+
+  useEffect(() => {
+    // Set a flag to ensure the component is mounted before navigation
+    setIsReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isReady) return;
+
+    const handleNavigation = async () => {
+      try {
+        await checkAuth();
+        
+        if (isAuthenticated) {
+          router.replace("/(tabs)/home");
+        } 
+        console.log(isAuthenticated);
+      } catch (e) {
+        console.log("Error occurred", e);
+      }
+    };
+
+    handleNavigation();
+  }, [user, isAuthenticated, token, isReady]);
+
   return (
     <View style={styles.container}>
       {/* <Location_modal/> */}
@@ -65,7 +99,10 @@ export default function Onboarding() {
               transition={{ delay: 700, duration: 1200 }}
             >
               <SlideToStart onSlideComplete={() => {
-                router.push("/home")
+                // router.push("/home")
+                router.push("/auth/Login")
+
+
               }} />
             </MotiView>
           </TouchableOpacity>

@@ -21,7 +21,7 @@ const SLIDER_WIDTH = width * 0.85;
 const SLIDER_HEIGHT = 72;
 const BUTTON_SIZE = 60;
 const TRACK_PADDING = 6;
-const MAX_SLIDE = (SLIDER_WIDTH - BUTTON_SIZE - TRACK_PADDING * 2) * 0.9; // 90% limit
+const MAX_SLIDE = (SLIDER_WIDTH - BUTTON_SIZE - TRACK_PADDING * 2)  
 
 export default function ModernSlideToStart({ onSlideComplete }) {
   const translateX = useSharedValue(0);
