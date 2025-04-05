@@ -1,6 +1,8 @@
 import { StyleSheet, Image, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useDispatch } from "react-redux";
+import { selectHotel } from "../../store/features/vendorFeature/vendor.slice";
 
 const HotelCard = ({
   hotel,
@@ -8,150 +10,77 @@ const HotelCard = ({
 }: {
   hotel: {
     id: number;
-    name: string;
-    location: string;
+    servicename: string;
+    address: string;
     price: number;
     rating: number;
-    image: string;
+    serviceimage: string;
   };
   isLarge?: boolean;
-}) => (
-  <TouchableOpacity onPress={()=>{
+}) => {
+  const dispatch = useDispatch();
+  
+  return (
+    <TouchableOpacity 
+      onPress={() => {
+        dispatch(selectHotel(hotel));
+        router.navigate(`/product/HotelScreen`);
+      }} 
+      style={isLarge ? styles.hotelCard : styles.recentHotelCard}
+    >
+      <Image 
+        source={{ uri: "https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db" || hotel.serviceimage }}
+        style={isLarge ? styles.hotelImage : styles.recentHotelImage}
+      />
+      <TouchableOpacity style={styles.favoriteButton}>
+        <Ionicons name="heart-outline" size={20} color="#FFF" />
+      </TouchableOpacity>
 
-    // This condition is just for testing purposes i have to remove it later and give a detailed screen
-    // router.push("/(tabs)/List")
-    router.push("/product/[id]")
-  }} style={isLarge ? styles.hotelCard : styles.recentHotelCard}>
-    <Image
-      source={{ uri: hotel.image }}
-      style={isLarge ? styles.hotelImage : styles.recentHotelImage}
-    />
-    <TouchableOpacity style={styles.favoriteButton}>
-      <Ionicons name="heart-outline" size={20} color="#FFF" />
+      {isLarge ? (
+        <View style={styles.hotelInfo}>
+          <Text style={styles.hotelName}>{hotel.servicename || "Hospital"}</Text>
+          <View style={styles.locationContainer}>
+            <Text style={styles.locationText}>{hotel.address}</Text>
+          </View>
+          <View style={styles.priceRatingContainer}>
+            <Text style={styles.priceText}>
+              ${hotel.price}
+              <Text style={styles.nightText}>/night</Text>
+            </Text>
+            <View style={styles.ratingContainer}>
+              <FontAwesome name="star" size={12} color="#FFD700" />
+              <Text style={styles.ratingText}>{hotel.rating || "N/A"}</Text>
+            </View>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.recentHotelInfo}>
+          <View style={styles.recentHotelHeader}>
+            <Text style={styles.recentHotelName}>{hotel.servicename}</Text>
+          </View>
+          <View style={styles.recentLocationContainer}>
+            <Ionicons name="location-outline" size={12} color="#666" />
+            <Text style={styles.recentLocationText}>{hotel.address}</Text>
+          </View>
+          <View style={styles.recentPriceRatingContainer}>
+            <Text style={styles.recentPriceText}>
+              ${hotel.price || 'N/A'}
+              <Text style={styles.recentNightText}>/night</Text>
+            </Text>
+            <View style={styles.recentRatingContainer}>
+              <FontAwesome name="star" size={12} color="#FFD700" />
+              <Text style={styles.recentRatingText}>{hotel.rating || "N/A"}</Text>
+            </View>
+          </View>
+        </View>
+      )}
     </TouchableOpacity>
-
-    {isLarge ? (
-      <View style={styles.hotelInfo}>
-        <Text style={styles.hotelName}>{hotel.name}</Text>
-        <View style={styles.locationContainer}>
-          <Ionicons name="location-outline" size={14} color="#666" />
-          <Text style={styles.locationText}>{hotel.location}</Text>
-        </View>
-        <View style={styles.priceRatingContainer}>
-          <Text style={styles.priceText}>
-            ${hotel.price}
-            <Text style={styles.nightText}>/night</Text>
-          </Text>
-          <View style={styles.ratingContainer}>
-            <FontAwesome name="star" size={12} color="#FFD700" />
-            <Text style={styles.ratingText}>{hotel.rating}</Text>
-          </View>
-        </View>
-      </View>
-    ) : (
-      <View style={styles.recentHotelInfo}>
-        <View style={styles.recentHotelHeader}>
-          <Text style={styles.recentHotelName}>{hotel.name}</Text>
-        </View>
-        <View style={styles.recentLocationContainer}>
-          <Ionicons name="location-outline" size={12} color="#666" />
-          <Text style={styles.recentLocationText}>{hotel.location}</Text>
-        </View>
-        <View style={styles.recentPriceRatingContainer}>
-          <Text style={styles.recentPriceText}>
-            ${hotel.price}
-            <Text style={styles.recentNightText}>/night</Text>
-          </Text>
-          <View style={styles.recentRatingContainer}>
-            <FontAwesome name="star" size={12} color="#FFD700" />
-            <Text style={styles.recentRatingText}>{hotel.rating}</Text>
-          </View>
-        </View>
-      </View>
-    )}
-  </TouchableOpacity>
-);
+  );
+};
 
 export default HotelCard;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFF",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-
-    paddingBottom: 16,
-  },
-  backButton: {
-    padding: 4,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F5F5F5",
-    borderRadius: 20,
-    marginLeft: 12,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: "100%",
-    fontSize: 16,
-    color: "#333",
-  },
-  content: {
-    paddingHorizontal: 16,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  lastSection: {
-    paddingBottom: 20,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 16,
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: "#08A4BD",
-    fontWeight: "500",
-  },
-  tagsContainer: {
-    flexDirection: "row",
-    marginTop: -8,
-  },
-  searchTag: {
-    backgroundColor: "#F0F9FA",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  searchTagText: {
-    color: "#08A4BD",
-    fontSize: 14,
-  },
-  recommendationsContainer: {
-    flexDirection: "row",
-  },
   hotelCard: {
     width: 240,
     borderRadius: 12,

@@ -27,7 +27,7 @@ export default function Onboarding() {
   }
 
   useEffect(() => {
-    // Set a flag to ensure the component is mounted before navigation
+
     setIsReady(true);
   }, []);
 
@@ -52,12 +52,12 @@ export default function Onboarding() {
 
   return (
     <View style={styles.container}>
-      {/* <Location_modal/> */}
+      
       <ImageBackground
         source={require("../../assets/images/main/home.png")}
         style={styles.backgroundImage}
       >
-        {/* Animated Content */}
+
         <MotiView
           from={{ opacity: 0, translateY: 30 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -83,7 +83,6 @@ export default function Onboarding() {
             </MotiText>
           </View>
 
-          {/* Floating Image */}
           <TouchableOpacity
             activeOpacity={0.8}
             style={{

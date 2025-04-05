@@ -8,7 +8,8 @@ import {
     TextStyle,
     FlexAlignType,
     Dimensions,
-    StatusBar
+    StatusBar,
+    SafeAreaView
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,7 +17,8 @@ import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '@/src/api/auth';
 import { ActivityIndicator } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { onLoading, reset } from '@/src/store/features/authFeature/auth.slice';
+
 
 
 const LoginScreen = () => {
@@ -27,23 +29,36 @@ const LoginScreen = () => {
     const { error, msg, token, isAuthenticated, isLoading } = useSelector((state) => state.auth);
 
     const handleLogin = async () => {
+       
         if (!email || !password) {
             alert("Please fill in all the fields")
             return;
         }
-
+        // dispatch(reset)
+        
+        if(error){
+            alert(error);
+            return;
+        }
         await loginUser(dispatch, email, password);
+        dispatch(onLoading(false))
     };
 
     useEffect(() => {
-        const token = AsyncStorage.getItem("token");
-
+        if(error){
+            alert(error);
+            dispatch(reset(null))
+            return;
+        }
         if (isAuthenticated) {
             router.push("/(tabs)/home")
         }
     }, [error, msg, token, isAuthenticated]);
 
     return (
+        <SafeAreaView style={{
+            flex:1
+        }}>
         <View style={[styles.container]}>
 
             <StatusBar
@@ -146,6 +161,7 @@ const LoginScreen = () => {
                 </View>
             </View>
         </View>
+        </SafeAreaView>
     );
 };
 

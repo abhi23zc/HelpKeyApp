@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import { StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import HotelCardSmall from "@/src/components/Card/HotelCardSmall";
 import { MotiScrollView } from "moti";
+import { useSelector } from "react-redux";
 
 // Sample favorites collection data
 const hotels = [
@@ -51,8 +52,19 @@ const hotels = [
 export default function Favorite() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredHotels = hotels.filter((hotel) =>
-    hotel.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const {vendors} = useSelector(state=>state.vendor)
+  const [favouriteVendors, setfavouriteVendors] = useState([])
+
+  useEffect(() => {
+    
+    let arr = vendors.slice(0,4)
+    setfavouriteVendors(arr) // Fetch from api  
+  }, [])
+  
+
+
+  const filteredHotels = favouriteVendors.filter((hotel) =>
+    hotel?.servicename.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -88,7 +100,7 @@ export default function Favorite() {
           data={filteredHotels}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
-          renderItem={({ item }) => <HotelCardSmall hotel={item} />}
+          renderItem={({ item }) => <HotelCardSmall hotel={item} isFav={true} />}
         />
       </MotiScrollView>
     </SafeAreaView>

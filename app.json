@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.zrf.helpkey"
+      "package": "com.zrf.helpkey",
+      "permissions": ["ACCESS_FINE_LOCATION"]
     },
     "web": {
       "bundler": "metro",

@@ -7,6 +7,7 @@ import HotelCardSmall from "@/src/components/Card/HotelCardSmall";
 import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FilterModal from "@/src/modals/FilterModal";
+import { useSelector } from "react-redux";
 const hotel: {
   id: number;
   name: string;
@@ -49,8 +50,16 @@ const hotel: {
   },
 ];
 
+
+
+
+
 export default function List() {
+  const {searchVendors} = useSelector(state=> state.vendor)
   const [isFilterModal, setisFilterModal] = useState(false);
+
+  
+  const { selectedLocation, error } = useSelector(state => state.vendor)
 
   return (
     <View style={styles.container}>
@@ -68,7 +77,7 @@ export default function List() {
             setisFilterModal(true);
           }}
         >
-          <Text style={styles.searchText}>Rajasthan, India</Text>
+          <Text style={styles.searchText}>{selectedLocation|| "Rajasthan"}, India</Text>
         </View>
 
         <TouchableOpacity
@@ -131,11 +140,12 @@ export default function List() {
           rowGap: 20,
           marginTop: 15,
         }}
-        data={hotel}
+        data={searchVendors}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         renderItem={({ item, index }) => (
-          <HotelCardSmall hotel={item} isLarge={true} />
+          // Fetch from api 
+          <HotelCardSmall hotel={item} isLarge={true}/>
         )}
       />
     </View>

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  Image, 
-  SafeAreaView,
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
   ViewStyle,
   TextStyle,
   FlexAlignType,
@@ -16,6 +15,10 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { registerUser } from '@/src/api/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { ActivityIndicator } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegistrationScreen = () => {
   const [name, setName] = useState('');
@@ -24,6 +27,9 @@ const RegistrationScreen = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [countryCode, setCountryCode] = useState('+91');
+  const dispatch = useDispatch();
+
+  const { isLoading, error, isAuthenticated, token } = useSelector(state => state.auth);
 
   const formatPhoneNumber = (text: string) => {
     const cleaned = text.replace(/\D/g, '');
@@ -36,50 +42,75 @@ const RegistrationScreen = () => {
     setPhoneNumber(formatPhoneNumber(text));
   };
 
+  async function handleSubmit() {
+    if (!name || !email || !password) {
+      alert("Please fill all fields!")
+      return; ``
+    }
+    try {
+
+      await registerUser(dispatch, { name, email, password });
+      if (error) {
+        alert(error)
+        return;
+      }
+      setName("")
+      setPhoneNumber("")
+      setPassword("")
+      setEmail("")
+      router.push("/auth/Login")
+    } catch (e) {
+
+    }
+
+  }
+
+  useEffect(() => {
+
+    if (isAuthenticated) {
+      router.push("/(tabs)/home")
+    }
+  }, [error, token, isAuthenticated]);
+
   return (
- 
-    <View style={[styles.container, ]}>
-           <StatusBar
+
+    <View style={[styles.container]}>
+      <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
         translucent
       />
       <LinearGradient
-
         colors={['#3b82f6', '#1e40af']}
         style={styles.headerBackground}
       >
         <View style={styles.helpKeyContainer}>
-            <View style={{
-                display:'flex',
-                flexDirection:'row',
-                alignItems:'center',
-                gap:10,
-            }}>
-
-          <FontAwesome name="life-ring" size={32} color="#ffffff" />
-          <Text style={styles.helpKeyText}>HelpKey</Text>
-            </View>
+          <View style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+          }}>
+            <FontAwesome name="life-ring" size={32} color="#ffffff" />
+            <Text style={styles.helpKeyText}>HelpKey</Text>
+          </View>
           <Text style={styles.helpKeySubtext}>Your trusted hotel companion</Text>
         </View>
       </LinearGradient>
       <View style={styles.scrollContainer}>
         <View style={styles.card}>
           <Text style={styles.title}>Get Started now</Text>
-          
-       
 
           <View style={styles.inputContainer}>
             <FontAwesome name="user" size={20} style={styles.icon} />
             <TextInput
               placeholder="Enter your full name"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
+              value={name}
+              onChangeText={setName}
               style={styles.input}
             />
           </View>
-          
+
           <View style={styles.inputContainer}>
             <FontAwesome name="envelope" size={20} style={styles.icon} />
             <TextInput
@@ -90,12 +121,12 @@ const RegistrationScreen = () => {
               style={styles.input}
             />
           </View>
-          
+
           <View style={styles.phoneInputContainer}>
             <View style={styles.countryCodeContainer}>
-              <Image 
-                source={{ uri: 'https://flagcdn.com/w40/in.png' }} 
-                style={styles.countryFlag} 
+              <Image
+                source={{ uri: 'https://flagcdn.com/w40/in.png' }}
+                style={styles.countryFlag}
               />
               <Text>{countryCode}</Text>
             </View>
@@ -107,7 +138,7 @@ const RegistrationScreen = () => {
               style={styles.input}
             />
           </View>
-          
+
           <View style={styles.inputContainer}>
             <FontAwesome name="lock" size={20} style={styles.icon} />
             <TextInput
@@ -118,26 +149,31 @@ const RegistrationScreen = () => {
               style={styles.input}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <FontAwesome 
-                name={showPassword ? "eye-slash" : "eye"} 
-                size={20} 
-                style={styles.icon} 
+              <FontAwesome
+                name={showPassword ? "eye-slash" : "eye"}
+                size={20}
+                style={styles.icon}
               />
             </TouchableOpacity>
           </View>
-          
-          <TouchableOpacity style={styles.registerButton} onPress={()=>{
-            router.push("/auth/verify_email")
+
+          <TouchableOpacity disabled={isLoading} style={styles.registerButton} onPress={() => {
+            // router.push("/auth/verify_email")
+            handleSubmit()
           }}>
-            <Text style={styles.registerButtonText}>Register</Text>
+            {
+              isLoading ?
+                <ActivityIndicator color='white' />
+                : <Text style={styles.registerButtonText}>Register</Text>
+            }
           </TouchableOpacity>
-          
+
           <View style={styles.orContainer}>
             <View style={styles.orLine} />
             <Text style={styles.orText}>Or</Text>
             <View style={styles.orLine} />
           </View>
-          
+
           <View style={styles.socialButtonContainer}>
             <TouchableOpacity style={styles.socialButton}>
               <FontAwesome name="google" size={24} color="#DB4437" />
@@ -146,10 +182,10 @@ const RegistrationScreen = () => {
               <FontAwesome name="facebook" size={24} color="#3b5998" />
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.loginContainer}>
             <Text style={{ color: '#888' }}>Already have an account? </Text>
-            <TouchableOpacity onPress={()=>{
+            <TouchableOpacity onPress={() => {
               router.push("/auth/Login")
             }}>
               <Text style={{ color: '#007bff', fontWeight: 'bold' }}>Login</Text>
@@ -163,34 +199,32 @@ const RegistrationScreen = () => {
 
 export default RegistrationScreen;
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const styles = {
   container: {
-    
     flex: 1,
-    width:'auto',
+    width: 'auto',
     backgroundColor: '#f0f4f8',
   } as ViewStyle,
   scrollContainer: {
-    
-    position:'absolute',
-    top:150,
-    width:width,
-    height:height,
+    position: 'absolute',
+    top: 150,
+    width: width,
+    height: height,
   } as ViewStyle,
   card: {
-    paddingTop:50,
+    paddingTop: 50,
     backgroundColor: 'white',
-    borderTopRightRadius:30,
-    borderTopLeftRadius:30,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
     padding: 25,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 5,
-    height:height
+    height: height
   } as ViewStyle,
   title: {
     fontSize: 24,
@@ -282,20 +316,18 @@ const styles = {
   } as ViewStyle,
   headerBackground: {
     height: 200,
-    borderBottomRightRadius:20,
-    position:'relative',
+    borderBottomRightRadius: 20,
+    position: 'relative',
   } as ViewStyle,
   helpKeyContainer: {
-    marginTop:StatusBar.currentHeight +15,
-    alignItems:'center',
-    gap:5,
-
+    marginTop: (StatusBar.currentHeight || 0) + 15,
+    alignItems: 'center' as FlexAlignType,
+    gap: 5,
   } as ViewStyle,
   helpKeyText: {
     color: '#ffffff',
     fontSize: 28,
     fontWeight: 'bold' as 'bold',
-
   } as TextStyle,
   helpKeySubtext: {
     color: '#ffffff',

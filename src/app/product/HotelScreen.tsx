@@ -15,12 +15,15 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { router, Stack } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { useSelector } from "react-redux";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const HotelScreen = () => {
-  // Using reliable image URLs from various sources
+
+  const {selectedHotel} = useSelector(state=>state.vendor)  
+
   const galleryImages = [
     {
       uri: "https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=800",
@@ -42,9 +45,9 @@ const HotelScreen = () => {
   };
 
   const [minLen, setMinLen] = useState(300);
-  let descriptionText=
+  let descriptionText =
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis deserunt unde libero quas perferendis quaerat, voluptas doloribus corporis aspernatur cupiditate eos rerum itaque? Debitis et unde voluptatum sed, possimus libero eligendi nisi magnam rem quo laudantium nulla beatae dolor officia? Atque illum incidunt autem? Sint a veniam incidunt facilis esse? Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus culpa voluptas nemo temporibus veniam nulla quam porro. Nesciunt, fugit rerum.."
-  
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -53,10 +56,10 @@ const HotelScreen = () => {
 
       {/* Header with Back and Share buttons */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={()=>{
-            // Navigation to previous screen
-            router.back()
-  
+        <TouchableOpacity onPress={() => {
+          // Navigation to previous screen
+          router.back()
+
         }} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
@@ -91,7 +94,7 @@ const HotelScreen = () => {
         {/* Hotel Info */}
         <View style={styles.hotelInfoContainer}>
           <View style={styles.hotelTitleRow}>
-            <Text style={styles.hotelName}>Hyatt Regency Bali</Text>
+            <Text style={styles.hotelName}>{selectedHotel?.servicename || "Hyatt Regency Bali"}</Text>
             <TouchableOpacity>
               <Ionicons name="heart" size={26} color="#FF3A5E" />
             </TouchableOpacity>
@@ -101,13 +104,13 @@ const HotelScreen = () => {
           <View style={styles.locationContainer}>
             <Ionicons name="location-outline" size={16} color="#777" />
             <Text style={styles.locationText}>
-              Jl. Danau Tamblingan No. 89, Sanur, Denpasar
+             { selectedHotel?.address || "Jl. Danau Tamblingan No. 89, Sanur, Denpasar"}
             </Text>
           </View>
 
           {/* Rating */}
-          <View style={styles.ratingContainer} onTouchStart={()=>{
-            router.push("product/HotelReview")
+          <View style={styles.ratingContainer} onTouchStart={() => {
+            router.push("/product/HotelReview")
           }}>
             <View style={styles.starsContainer}>
               {[1, 2, 3, 4, 5].map((_, index) => (
@@ -142,7 +145,7 @@ const HotelScreen = () => {
                 <Text style={styles.facilityText}>Pool</Text>
               </View>
               <View style={styles.facilityItem}>
-              <MaterialCommunityIcons name="beach" size={20} color="black" />
+                <MaterialCommunityIcons name="beach" size={20} color="black" />
                 <Text style={styles.facilityText}>Beach</Text>
               </View>
               <View style={styles.facilityItem}>
@@ -164,7 +167,7 @@ const HotelScreen = () => {
           <View style={styles.descriptionSection}>
             <Text style={styles.sectionTitle}>Description</Text>
             <Text style={styles.descriptionText}>
-              {descriptionText.substring(0, minLen)}...
+              {selectedHotel?.description?.substring(0, minLen) || descriptionText.substring(0, minLen)}...
             </Text>
 
             {minLen <= 300 ? (
@@ -174,7 +177,7 @@ const HotelScreen = () => {
                 <Text style={styles.readMoreText}>Read more</Text>{" "}
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity onPress={()=>{
+              <TouchableOpacity onPress={() => {
                 setMinLen(300);
               }}>
                 <Text style={styles.readMoreText}>Read less</Text>
@@ -183,22 +186,22 @@ const HotelScreen = () => {
           </View>
 
           {/* Price and Book Now */}
-        
+
         </View>
       </ScrollView>
       <View style={styles.priceBookContainer}>
-            <View style={styles.priceContainer}>
-              <Text style={styles.priceLabel}>Price</Text>
-              <View style={styles.priceRow}>
-                <Text style={styles.priceAmount}>$56</Text>
-                <Text style={styles.priceNight}>/ night</Text>
-              </View>
-            </View>
-
-            <TouchableOpacity style={styles.bookButton} activeOpacity={0.9}>
-              <Text style={styles.bookButtonText}>Book Now</Text>
-            </TouchableOpacity>
+        <View style={styles.priceContainer}>
+          <Text style={styles.priceLabel}>Price</Text>
+          <View style={styles.priceRow}>
+            <Text style={styles.priceAmount}>$56</Text>
+            <Text style={styles.priceNight}>/ night</Text>
           </View>
+        </View>
+
+        <TouchableOpacity style={styles.bookButton} activeOpacity={0.9}>
+          <Text style={styles.bookButtonText}>Book Now</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -373,12 +376,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   descriptionText: {
+    fontWeight:400, 
+    color: "#777",
     marginTop: 8,
     fontSize: 14,
-    lineHeight: 22,
-    color: "#666",
+    lineHeight: 28,
     flex: 1,
     flexWrap: "wrap",
+    letterSpacing:1,
   },
   readMoreText: {
     color: "#00A8E8",
@@ -391,7 +396,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingTop: 20,
     borderTopWidth: 1,
-    margin:20,
+    margin: 20,
     borderTopColor: "#F0F0F0",
   },
   priceContainer: {

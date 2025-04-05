@@ -9,6 +9,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { selectLocation } from "@/src/store/features/vendorFeature/vendor.slice";
 
 const locations = [
   { type: "location", name: "Kanpur", country: "India" },
@@ -23,22 +25,30 @@ const hotels = [
   { type: "hotel", name: "Golden Tulip Resort Bali", location: "Badung, Bali" },
 ];
 
-const LocationSearch = ({modalVisible, setModalVisible}:any) => {
+const LocationSearch = ({ modalVisible, setModalVisible, setSearchModalVisible }: any) => {
 
-  const [searchText, setSearchText] = useState("");
+  const { selectedLocation, error } = useSelector(state => state.vendor)
+  const [searchText, setSearchText] = useState(selectedLocation || "Kanpur");
   const [filteredLocations, setFilteredLocations] = useState([...locations, ...hotels]);
-
+  const dispatch = useDispatch();
   const handleSearch = (text) => {
-    setSearchText(text);
+    setSearchText(text)
     if (text.length > 0) {
       const filtered = [...locations, ...hotels].filter((item) =>
         item.name.toLowerCase().includes(text.toLowerCase())
+
       );
       setFilteredLocations(filtered);
     } else {
       setFilteredLocations([...locations, ...hotels]);
     }
   };
+
+  async function handleSubmit() {
+    setModalVisible(false)
+    setSearchModalVisible(false)
+  }
+
 
   return (
     <View style={styles.container}>
@@ -56,6 +66,11 @@ const LocationSearch = ({modalVisible, setModalVisible}:any) => {
               value={searchText}
               onChangeText={handleSearch}
               autoFocus
+              onSubmitEditing={() => {
+                handleSubmit()
+                dispatch(selectLocation(searchText))
+              }
+              }
             />
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Ionicons name="close" size={24} color="#666" style={styles.closeIcon} />
@@ -74,7 +89,11 @@ const LocationSearch = ({modalVisible, setModalVisible}:any) => {
               </>
             }
             renderItem={({ item }) => (
-              <TouchableOpacity style={styles.locationItem}>
+              <TouchableOpacity style={styles.locationItem} onPress={() => {
+                setSearchText(item.name)
+                dispatch(selectLocation(item.name))
+                handleSubmit()
+              }}>
                 {item.type === "location" ? (
                   <Ionicons name="location-outline" size={22} color="#444" />
                 ) : (
@@ -86,8 +105,8 @@ const LocationSearch = ({modalVisible, setModalVisible}:any) => {
                 </View>
               </TouchableOpacity>
             )}
-            
-            
+
+
           />
         </View>
       </Modal>
@@ -127,7 +146,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f0f0f0",
     borderRadius: 50,
-    paddingHorizontal:5,
+    paddingHorizontal: 5,
     marginVertical: 20,
     borderWidth: 1,
     borderColor: "#08A4BD",

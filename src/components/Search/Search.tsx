@@ -8,6 +8,9 @@ import LocationModal from "@/src/modals/Location_modal";
 import DateModal from "@/src/modals/DateModal";
 import GuestModal from "@/src/modals/GuestModal";
 import { router } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchVendor, nearByVendors } from "@/src/api/vendor";
+import { ActivityIndicator } from "react-native-paper";
 
 export default function Search() {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -18,6 +21,31 @@ export default function Search() {
   const [checkInDate, setcheckInDate] = useState("Select Date");
   const [checkOutDate, setcheckOutDate] = useState("Select Date");
   const [guestCount, setGuestCount] = useState("Add Guest");
+  const [isLoading, setisLoading] = useState(false)
+
+  const { selectedLocation, error } = useSelector(state => state.vendor)
+  const dispatch = useDispatch();
+
+  async function handleSubmit() {
+    setisLoading(true)
+    try {
+      await fetchVendor({
+        
+          "latitude":"",
+          "longitude":"",
+          "city":selectedLocation,
+          "propertyType":"26"
+      
+      }, dispatch)
+
+      router.navigate("/product/List")
+
+      // console.log(vendors[0].servicename)
+    } catch (e) {
+      console.log(e);
+    }
+    setisLoading(false)
+  }
 
   return (
     <View style={styles.searchContainer}>
@@ -34,13 +62,13 @@ export default function Search() {
         />
       )}
       {isGuestModalVisible && (
-        <GuestModal isGuestModalVisible={isGuestModalVisible} setGuestModalVisible={setGuestModalVisible} />
+        <GuestModal isGuestModalVisible={isGuestModalVisible} setGuestCount={setGuestCount} setGuestModalVisible={setGuestModalVisible} />
       )}
 
       <Text style={styles.label}>Location</Text>
       <View style={styles.searchInput} onTouchEnd={() => setModalVisible(true)}>
         <Feather name="map-pin" size={20} color="gray" style={{ marginLeft: 10 }} />
-        <Text style={styles.textPlaceholder}>Search for hotels, villas...</Text>
+        <Text style={styles.textPlaceholder}>{selectedLocation || "Search for hotels, villas..."} </Text>
       </View>
 
       <View style={styles.rowContainer}>
@@ -48,8 +76,9 @@ export default function Search() {
           <Text style={styles.label}>Check in</Text>
           <View style={styles.searchInputSmall} onTouchStart={() => {
             setcheckInValue("checkin")
-            setDateModalVisible(true)}
-            }>
+            setDateModalVisible(true)
+          }
+          }>
             <Fontisto name="date" size={15} color="black" style={{ marginLeft: 10 }} />
             <Text style={styles.textPlaceholder}>{checkInDate}</Text>
           </View>
@@ -59,8 +88,9 @@ export default function Search() {
           <Text style={styles.label}>Check out</Text>
           <View style={styles.searchInputSmall} onTouchStart={() => {
             setcheckInValue("checkout")
-            setDateModalVisible(true)}
-            }>
+            setDateModalVisible(true)
+          }
+          }>
             <Fontisto name="date" size={15} color="black" style={{ marginLeft: 10 }} />
             <Text style={styles.textPlaceholder}>{checkOutDate}</Text>
           </View>
@@ -75,11 +105,16 @@ export default function Search() {
         </View>
       </View>
 
-      <View style={styles.searchButtonContainer} onTouchStart={()=>{
-        router.push("/product/List")
+      <View style={styles.searchButtonContainer} onTouchStart={() => {
+        // router.push("/product/List") // Make an api call to search by location 
+        handleSubmit()
+
       }}>
         <LinearGradient colors={["#007ACC", "#0056B3"]} style={styles.searchButton}>
-          <Text style={styles.searchButtonText}>Search</Text>
+          {
+             isLoading ? <ActivityIndicator color="white"/> : 
+            <Text style={styles.searchButtonText}>Search</Text>
+          }
         </LinearGradient>
       </View>
     </View>
@@ -98,7 +133,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
-    padding:5,
+    padding: 5,
   },
   label: {
     fontSize: 15,

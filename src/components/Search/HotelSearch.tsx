@@ -113,6 +113,7 @@ export default function HotelSearchScreen({
       <LocationSearch
         modalVisible={locationModal}
         setModalVisible={setlocationModal}
+        setSearchModalVisible = {setModalVisible}
       />
       <StatusBar barStyle="dark-content" />
 

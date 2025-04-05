@@ -60,6 +60,7 @@ export default function DateModal({
             } else {
               setcheckOutDate(selectedDate);
             }
+            
             setModalVisible(false);
           }}
         >

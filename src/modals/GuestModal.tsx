@@ -8,7 +8,7 @@ import { X } from "lucide-react-native";
 const deviceWidth = Dimensions.get("window").width;
 const deviceHeight = Dimensions.get("window").height;
 
-export default function GuestModal({ isGuestModalVisible, setGuestModalVisible }: any) {
+export default function GuestModal({ isGuestModalVisible, setGuestModalVisible , setGuestCount}: any) {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
@@ -45,7 +45,10 @@ export default function GuestModal({ isGuestModalVisible, setGuestModalVisible }
         {/* Confirm Button */}
         <TouchableOpacity
           style={styles.confirmButton}
-         
+         onPress={()=>{
+          setGuestCount(adults+children+infants)
+          setGuestModalVisible(false)
+         }}
         >
           <Text style={styles.confirmText}>Confirm</Text>
         </TouchableOpacity>

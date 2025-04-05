@@ -1,10 +1,29 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { onLoading, loginFailed, loginSucces, authSuccess, logout } from "../store/features/authFeature/auth.slice";
+import { onLoading, loginFailed, loginSucces, authSuccess, logout, registerSucces, reset } from "../store/features/authFeature/auth.slice";
 import axios from 'axios'
+
+export const registerUser = async (dispatch, formData) => {
+    dispatch(onLoading(true));
+    dispatch(reset(null));
+    try {
+        const response = await axios.post("https://helpkeyapi.onrender.com/api/signup", {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+        })
+        // console.log(response.data)
+        const { token, isAuthenticated, error } = response.data;
+        dispatch(registerSucces({ token, isAuthenticated, error }))
+    } catch (error) {
+        console.log("Register: ", error)
+    }
+    dispatch(onLoading(false))
+};
 
 
 export const loginUser = async (dispatch, email, password) => {
-    dispatch(onLoading(true));
+    dispatch(reset(null));
+    dispatch(onLoading(true))
     try {
         const response = await axios.post("https://helpkeyapi.onrender.com/api/login", {
             email,
@@ -13,7 +32,17 @@ export const loginUser = async (dispatch, email, password) => {
 
         console.log(response.data);
         const { token, msg, error, isAuthenticated } = response.data;
-
+        if(error){
+            alert(error)
+            dispatch(reset(null))
+            return;
+        }
+        if(!token){
+            alert(msg)
+            dispatch(reset(null))
+  
+            return;
+        }
         await AsyncStorage.setItem("token", token);
         dispatch(loginSucces({ token, msg, error, isAuthenticated }));
 
@@ -22,11 +51,10 @@ export const loginUser = async (dispatch, email, password) => {
         dispatch(loginFailed("Login failed"));
     }
 
-    dispatch(onLoading(false))
 };
 
 export const authUser = async (dispatch) => {
-    dispatch(onLoading(true));
+
     console.log("Fetching user")
     try {
         const token = await AsyncStorage.getItem("token");
@@ -42,7 +70,6 @@ export const authUser = async (dispatch) => {
     } catch (error) {
         dispatch(loginFailed("Unauthorized User"));
     }
-    dispatch(onLoading(false))
 };
 
 
