@@ -20,7 +20,15 @@ export default function Search() {
   const [checkInValue, setcheckInValue] = useState("")
   const [checkInDate, setcheckInDate] = useState("Select Date");
   const [checkOutDate, setcheckOutDate] = useState("Select Date");
-  const [guestCount, setGuestCount] = useState("Add Guest");
+
+  // const [guestCount, setGuestCount] = useState("Add Guest");
+  const [guestCount, setGuestCount] = useState({
+    adults:0,
+    children:0,
+    infants: 0
+  });
+
+
   const [isLoading, setisLoading] = useState(false)
 
   const { selectedLocation, error } = useSelector(state => state.vendor)
@@ -62,7 +70,7 @@ export default function Search() {
         />
       )}
       {isGuestModalVisible && (
-        <GuestModal isGuestModalVisible={isGuestModalVisible} setGuestCount={setGuestCount} setGuestModalVisible={setGuestModalVisible} />
+        <GuestModal isGuestModalVisible={isGuestModalVisible} guestCount={guestCount} setGuestCount={setGuestCount} setGuestModalVisible={setGuestModalVisible} />
       )}
 
       <Text style={styles.label}>Location</Text>
@@ -101,7 +109,7 @@ export default function Search() {
         <Text style={styles.label}>Add Guest</Text>
         <View style={styles.searchInputSmall} onTouchEnd={() => setGuestModalVisible(true)}>
           <AntDesign name="adduser" size={15} color="black" style={{ marginLeft: 10 }} />
-          <Text style={styles.textPlaceholder}>{guestCount}</Text>
+          <Text style={styles.textPlaceholder}>{ guestCount?.adults + guestCount?.infants + guestCount?.children}</Text>
         </View>
       </View>
 

@@ -47,7 +47,7 @@ export default function Onboarding() {
       }
     };
 
-    handleNavigation();
+    // handleNavigation();
   }, [user, isAuthenticated, token, isReady]);
 
   return (
@@ -98,8 +98,8 @@ export default function Onboarding() {
               transition={{ delay: 700, duration: 1200 }}
             >
               <SlideToStart onSlideComplete={() => {
-                // router.push("/home")
-                router.push("/auth/Login")
+                router.push("/home")
+                // router.push("/auth/Login")
 
 
               }} />

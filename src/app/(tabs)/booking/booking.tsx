@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateModal from '@/src/modals/DateModal';
+import GuestModal from '@/src/modals/GuestModal';
+import { router } from 'expo-router';
 
 
 const BookingScreen = () => {
@@ -20,7 +22,7 @@ const BookingScreen = () => {
   const scaleAnim = useState(new Animated.Value(0.95))[0];
 
   useEffect(() => {
-    // Start animations when component mounts
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -41,34 +43,53 @@ const BookingScreen = () => {
   const [checkInDate, setcheckInDate] = useState("Select Date");
   const [checkOutDate, setcheckOutDate] = useState("Select Date");
   const [checkInValue, setcheckInValue] = useState("")
-    const [isDateModalVisible, setDateModalVisible] = useState(false);
+  const [isDateModalVisible, setDateModalVisible] = useState(false);
+  const [guestCount, setGuestCount] = useState({
+    adults:0,
+    children:0,
+    infants: 0
+  });
+  const [isGuestModalVisible, setGuestModalVisible] = useState(false);
+
 
   return (
     <SafeAreaView style={styles.container}>
+
+      {/* Date Modal */}
       <DateModal isModalVisible={isDateModalVisible}
         setModalVisible={setDateModalVisible}
         value={checkInValue}
         setcheckInDate={setcheckInDate}
         setcheckOutDate={setcheckOutDate} />
+
+      {isGuestModalVisible && (
+        <GuestModal isGuestModalVisible={isGuestModalVisible} guestCount={guestCount} setGuestCount={setGuestCount} setGuestModalVisible={setGuestModalVisible} />
+      )}
+
+
+
       <StatusBar barStyle="dark-content" />
 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
+          <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Booking and Payment</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 24 }} /> {/* Empty view for symmetry */}
       </View>
+
 
       {/* Stepper */}
       <View style={styles.stepper}>
+
         <View style={styles.stepContainer}>
           <View style={[styles.stepCircle, { backgroundColor: '#2CB9B0' }]}>
             <Text style={styles.stepActiveText}>1</Text>
           </View>
           <Text style={[styles.stepText, { color: '#2CB9B0' }]}>Booking</Text>
         </View>
+
         <View style={styles.stepLine} />
         <View style={styles.stepContainer}>
           <View style={[styles.stepCircle, { backgroundColor: '#E8E8E8' }]}>
@@ -76,6 +97,8 @@ const BookingScreen = () => {
           </View>
           <Text style={styles.stepText}>Guest Info</Text>
         </View>
+
+
         <View style={styles.stepLine} />
         <View style={styles.stepContainer}>
           <View style={[styles.stepCircle, { backgroundColor: '#E8E8E8' }]}>
@@ -98,26 +121,26 @@ const BookingScreen = () => {
           {/* Hotel Card */}
           <View style={styles.hotelCard}>
             <Image
-              source={{ uri: 'https://example.com/hotel-room.jpg' }}
+              source={{ uri: 'https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db' }}
               style={styles.hotelImage}
             />
             <View style={styles.hotelInfo}>
-              <Text style={styles.hotelName}>Hyatt Regency Bali</Text>
+              <Text style={styles.hotelName}>Taj Palace</Text>
               <View style={styles.locationRow}>
                 <Ionicons name="location-outline" size={14} color="#666" />
-                <Text style={styles.locationText}>Denpasar, Bali</Text>
+                <Text style={styles.locationText}>New Delhi, India</Text>
               </View>
               <View style={styles.roomRow}>
                 <Ionicons name="bed-outline" size={14} color="#666" />
-                <Text style={styles.roomText}>Suite King Bed</Text>
+                <Text style={styles.roomText}>Luxury Suite</Text>
               </View>
               <View style={styles.priceRatingRow}>
                 <Text style={styles.priceText}>
-                  <Text style={styles.priceValue}>$64</Text>/night
+                  <Text style={styles.priceValue}>₹8,500</Text>/night
                 </Text>
                 <View style={styles.ratingContainer}>
                   <Ionicons name="star" size={14} color="#FFD700" />
-                  <Text style={styles.ratingText}>4.8</Text>
+                  <Text style={styles.ratingText}>4.9</Text>
                 </View>
               </View>
             </View>
@@ -127,7 +150,7 @@ const BookingScreen = () => {
           <View style={styles.dateRow}>
             <View style={styles.dateColumn}>
               <Text style={styles.dateLabel}>Check in</Text>
-              <TouchableOpacity style={styles.dateSelector} onPress={()=> {
+              <TouchableOpacity style={styles.dateSelector} onPress={() => {
                 setcheckInValue("checkin")
                 setDateModalVisible(true)
               }}>
@@ -137,7 +160,7 @@ const BookingScreen = () => {
             </View>
             <View style={styles.dateColumn}>
               <Text style={styles.dateLabel}>Check out</Text>
-              <TouchableOpacity style={styles.dateSelector} onPress={()=>{
+              <TouchableOpacity style={styles.dateSelector} onPress={() => {
                 setcheckInValue("checkout")
                 setDateModalVisible(true)
               }}>
@@ -151,9 +174,9 @@ const BookingScreen = () => {
           {/* Rooms and Guests */}
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionLabel}>Rooms and Guests</Text>
-            <TouchableOpacity style={styles.selectorButton}>
+            <TouchableOpacity style={styles.selectorButton} onPress={()=> setGuestModalVisible(true)}>
               <Ionicons name="person-outline" size={20} color="#666" />
-              <Text style={styles.selectorPlaceholder}>Select room and guest</Text>
+              <Text style={styles.selectorPlaceholder}>{guestCount?.adults + guestCount?.children + guestCount?.infants  || "Select room and guest"}</Text>
             </TouchableOpacity>
           </View>
 
@@ -171,7 +194,9 @@ const BookingScreen = () => {
 
       {/* Next Button */}
       <Animated.View style={[styles.buttonContainer, { opacity: fadeAnim }]}>
-        <TouchableOpacity style={styles.nextButton}>
+        <TouchableOpacity style={styles.nextButton} onPress={()=>{
+          router.navigate("/(tabs)/booking/GuestInfo")
+        }}>
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </Animated.View>
@@ -185,22 +210,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   header: {
-    paddingTop: StatusBar.currentHeight,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    height: 56,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: '#eee',
+    marginTop:StatusBar.currentHeight
   },
   backButton: {
-    padding: 8,
+    padding: 4,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000000',
+    color: '#333',
   },
   stepper: {
     flexDirection: 'row',

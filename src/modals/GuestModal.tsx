@@ -8,10 +8,11 @@ import { X } from "lucide-react-native";
 const deviceWidth = Dimensions.get("window").width;
 const deviceHeight = Dimensions.get("window").height;
 
-export default function GuestModal({ isGuestModalVisible, setGuestModalVisible , setGuestCount}: any) {
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
-  const [infants, setInfants] = useState(0);
+export default function GuestModal({ isGuestModalVisible, setGuestModalVisible , setGuestCount, guestCount}: any) {
+  console.log(guestCount)
+  const [adults, setAdults] = useState(guestCount?.adults);
+  const [children, setChildren] = useState(guestCount?.children);
+  const [infants, setInfants] = useState(guestCount?.infants);
 
   return (
     <Modal
@@ -38,15 +39,14 @@ export default function GuestModal({ isGuestModalVisible, setGuestModalVisible ,
         <Text style={styles.title}>Select Guest</Text>
 
         {/* Guest Categories */}
-        {renderGuestOption("Adults", "Ages 13 or above", adults, setAdults)}
-        {renderGuestOption("Children", "Ages 2 - 12", children, setChildren)}
-        {renderGuestOption("Infants", "Ages under 2", infants, setInfants)}
+        {renderGuestOption("Adults", "Ages 13 or above", guestCount?.adults, setGuestCount)}
+        {renderGuestOption("Children", "Ages 2 - 12", guestCount?.children, setGuestCount)}
+        {renderGuestOption("Infants", "Ages under 2", guestCount?.infants, setGuestCount)}
 
         {/* Confirm Button */}
         <TouchableOpacity
           style={styles.confirmButton}
          onPress={()=>{
-          setGuestCount(adults+children+infants)
           setGuestModalVisible(false)
          }}
         >
@@ -66,14 +66,30 @@ const renderGuestOption = (label: string, subLabel: string, count: number, setCo
     <View style={styles.counter}>
       <TouchableOpacity
         style={styles.counterButton}
-        onPress={() => setCount(Math.max(0, count - 1))}
+        onPress={() => {
+          if (label === "Adults") {
+            setCount((prev: any) => ({ ...prev, adults: Math.max(0, count - 1) }));
+          } else if (label === "Children") {
+            setCount((prev: any) => ({ ...prev, children: Math.max(0, count - 1) }));
+          } else if (label === "Infants") {
+            setCount((prev: any) => ({ ...prev, infants: Math.max(0, count - 1) }));
+          }
+        }}
       >
         <Text style={styles.counterText}>-</Text>
       </TouchableOpacity>
       <Text style={styles.count}>{count}</Text>
       <TouchableOpacity
         style={styles.counterButton}
-        onPress={() => setCount(count + 1)}
+        onPress={() => {
+          if (label === "Adults") {
+            setCount((prev: any) => ({ ...prev, adults: count + 1 }));
+          } else if (label === "Children") {
+            setCount((prev: any) => ({ ...prev, children: count + 1 }));
+          } else if (label === "Infants") {
+            setCount((prev: any) => ({ ...prev, infants: count + 1 }));
+          }
+        }}
       >
         <Text style={styles.counterText}>+</Text>
       </TouchableOpacity>
